@@ -20,7 +20,6 @@
             "default": "daraz",
             "prefill": "daraz"
         },
-<<<<<<< HEAD
         "scrapeProductDetails": {
             "title": "Scrape product details (price + images)",
             "type": "boolean",
@@ -45,18 +44,6 @@
             "title": "Proxy configuration",
             "type": "object",
             "description": "Proxy settings. For product scraping, use Apify Proxy with RESIDENTIAL group and country NP (Nepal) for the best success rate against Daraz bot protection.",
-=======
-        "expandShortLinks": {
-            "title": "Expand short links",
-            "type": "boolean",
-            "description": "Follow redirects on short links (e.g. s.daraz.com.np) to also capture the final product URL. Slower, and best run with Apify Proxy enabled.",
-            "default": false
-        },
-        "proxyConfiguration": {
-            "title": "Proxy configuration",
-            "type": "object",
-            "description": "Proxy settings. Using Apify Proxy is recommended to avoid IP rate limits.",
->>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
             "editor": "proxy",
             "default": { "useApifyProxy": true }
         }

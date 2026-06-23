@@ -2,11 +2,7 @@
     "name": "linktree-daraz-scraper",
     "version": "0.0.1",
     "type": "module",
-<<<<<<< HEAD
     "description": "Apify Actor that scrapes Daraz links (with price + images) from a Linktree profile.",
-=======
-    "description": "Apify Actor that scrapes Daraz (or any) links from a Linktree profile.",
->>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     "engines": {
         "node": ">=18.0.0"
     },

@@ -6,7 +6,6 @@
         "overview": {
             "title": "Links",
             "transformation": {
-<<<<<<< HEAD
                 "fields": [
                     "title",
                     "productName",
@@ -21,14 +20,10 @@
                     "detailStatus",
                     "profileUsername"
                 ]
-=======
-                "fields": ["title", "url", "expandedUrl", "domain", "type", "group", "position", "profileUsername"]
->>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
             },
             "display": {
                 "component": "table",
                 "properties": {
-<<<<<<< HEAD
                     "title": { "label": "Link Title", "format": "text" },
                     "productName": { "label": "Product", "format": "text" },
                     "price": { "label": "Price", "format": "text" },
@@ -40,15 +35,6 @@
                     "type": { "label": "Type", "format": "text" },
                     "group": { "label": "Group", "format": "text" },
                     "detailStatus": { "label": "Detail Status", "format": "text" },
-=======
-                    "title": { "label": "Title", "format": "text" },
-                    "url": { "label": "URL", "format": "link" },
-                    "expandedUrl": { "label": "Expanded URL", "format": "link" },
-                    "domain": { "label": "Domain", "format": "text" },
-                    "type": { "label": "Type", "format": "text" },
-                    "group": { "label": "Group", "format": "text" },
-                    "position": { "label": "Position", "format": "number" },
->>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
                     "profileUsername": { "label": "Profile", "format": "text" }
                 }
             }
