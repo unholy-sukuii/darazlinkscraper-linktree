@@ -15,10 +15,10 @@
         "linkFilter": {
             "title": "Link filter (hostname contains)",
             "type": "string",
-            "description": "Only keep links whose hostname contains this text (case-insensitive). Default 'daraz' keeps daraz.com.np, s.daraz.com.np and click.daraz.com.np links. Leave EMPTY to return every link on the profile.",
+            "description": "Only keep links whose hostname contains this text (case-insensitive). Leave EMPTY (the default) to return EVERY link on the profile. Set it to e.g. 'daraz' to keep only daraz.com.np, s.daraz.com.np and click.daraz.com.np links.",
             "editor": "textfield",
-            "default": "daraz",
-            "prefill": "daraz"
+            "default": "",
+            "prefill": ""
         },
         "scrapeProductDetails": {
             "title": "Scrape product details (price + images)",

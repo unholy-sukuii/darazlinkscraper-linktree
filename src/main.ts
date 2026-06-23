@@ -60,7 +60,7 @@ if (!input) throw new Error('Input is missing!');
 
 const {
     profileUrl,
-    linkFilter = 'daraz',
+    linkFilter = '',
     expandShortLinks = false,
     scrapeProductDetails = false,
     maxConcurrency = 5,
@@ -435,7 +435,8 @@ if (needsExpansion && baseRows.length > 0) {
     await mapPool(baseRows, maxConcurrency, async (row, idx) => {
         const patch: Partial<OutputLink> = {};
 
-        if (scrapeProductDetails) {
+        // Product scraping is Daraz-specific; for any non-Daraz link just resolve its final URL.
+        if (scrapeProductDetails && row.domain.includes('daraz')) {
             const details = await scrapeDarazProduct(row.url);
             // The product scrape discovers the real product URL via the tracking redirect.
             patch.expandedUrl = details.resolvedUrl;
