@@ -1,0 +1,38 @@
+{
+    "$schema": "https://apify.com/schemas/v1/input.ide.json",
+    "title": "Linktree Daraz Link Scraper",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "profileUrl": {
+            "title": "Linktree profile URL",
+            "type": "string",
+            "description": "Full URL of the Linktree profile to scrape, e.g. https://linktr.ee/jasminemaharjan__",
+            "editor": "textfield",
+            "prefill": "https://linktr.ee/jasminemaharjan__",
+            "pattern": "^https?://(www\\.)?linktr\\.ee/.+"
+        },
+        "linkFilter": {
+            "title": "Link filter (hostname contains)",
+            "type": "string",
+            "description": "Only keep links whose hostname contains this text (case-insensitive). Default 'daraz' keeps daraz.com.np, s.daraz.com.np and click.daraz.com.np links. Leave EMPTY to return every link on the profile.",
+            "editor": "textfield",
+            "default": "daraz",
+            "prefill": "daraz"
+        },
+        "expandShortLinks": {
+            "title": "Expand short links",
+            "type": "boolean",
+            "description": "Follow redirects on short links (e.g. s.daraz.com.np) to also capture the final product URL. Slower, and best run with Apify Proxy enabled.",
+            "default": false
+        },
+        "proxyConfiguration": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Proxy settings. Using Apify Proxy is recommended to avoid IP rate limits.",
+            "editor": "proxy",
+            "default": { "useApifyProxy": true }
+        }
+    },
+    "required": ["profileUrl"]
+}

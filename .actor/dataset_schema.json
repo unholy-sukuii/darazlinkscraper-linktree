@@ -1,0 +1,26 @@
+{
+    "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Links",
+            "transformation": {
+                "fields": ["title", "url", "expandedUrl", "domain", "type", "group", "position", "profileUsername"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "title": { "label": "Title", "format": "text" },
+                    "url": { "label": "URL", "format": "link" },
+                    "expandedUrl": { "label": "Expanded URL", "format": "link" },
+                    "domain": { "label": "Domain", "format": "text" },
+                    "type": { "label": "Type", "format": "text" },
+                    "group": { "label": "Group", "format": "text" },
+                    "position": { "label": "Position", "format": "number" },
+                    "profileUsername": { "label": "Profile", "format": "text" }
+                }
+            }
+        }
+    }
+}
