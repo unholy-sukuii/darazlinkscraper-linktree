@@ -75,3 +75,4 @@ https://api.apify.com/v2/datasets/<DATASET_ID>/items?format=json
 
 - If a profile doesn't exist, is private, or was renamed, Linktree returns a 404 and the Actor fails with a clear message. Double-check the exact username, including trailing characters like `_`.
 - `expandShortLinks` depends on Daraz's short-link service following server-side redirects. When it can't resolve, `expandedUrl` stays `null` and the original short URL is preserved.
+# darazlinkscraper-linktree
