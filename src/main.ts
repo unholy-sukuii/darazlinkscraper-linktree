@@ -12,8 +12,11 @@ interface Input {
     profileUrl: string;
     linkFilter?: string;
     expandShortLinks?: boolean;
+<<<<<<< HEAD
     scrapeProductDetails?: boolean;
     maxConcurrency?: number;
+=======
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     proxyConfiguration?: {
         useApifyProxy?: boolean;
         apifyProxyGroups?: string[];
@@ -31,6 +34,7 @@ interface LinktreeLink {
     parent?: { id: number } | null;
 }
 
+<<<<<<< HEAD
 /** Product details scraped from a Daraz product page. */
 interface ProductDetails {
     productName: string | null;
@@ -44,6 +48,10 @@ interface ProductDetails {
 
 /** One row we push to the dataset. */
 interface OutputLink extends Partial<ProductDetails> {
+=======
+/** One row we push to the dataset. */
+interface OutputLink {
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     profileUsername: string;
     title: string;
     url: string;
@@ -62,8 +70,11 @@ const {
     profileUrl,
     linkFilter = 'daraz',
     expandShortLinks = false,
+<<<<<<< HEAD
     scrapeProductDetails = false,
     maxConcurrency = 5,
+=======
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     proxyConfiguration: proxyInput,
 } = input;
 
@@ -75,6 +86,7 @@ if (!profileUrl || !/^https?:\/\/(www\.)?linktr\.ee\/.+/i.test(profileUrl.trim()
 
 const cleanUrl = profileUrl.trim().split('?')[0].replace(/\/+$/, '');
 const filterTerm = linkFilter.trim().toLowerCase();
+<<<<<<< HEAD
 // Scraping product details requires resolving the short link to the real product URL.
 const needsExpansion = expandShortLinks || scrapeProductDetails;
 
@@ -89,6 +101,12 @@ const BROWSER_HEADERS = {
     'Accept-Language': 'en-US,en;q=0.9',
 };
 
+=======
+
+// Configure proxy (recommended on the Apify platform to avoid IP rate limits).
+const proxyConfiguration = await Actor.createProxyConfiguration(proxyInput);
+
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 /** Pick a hostname out of a URL, lower-cased; returns '' if not parseable. */
 function hostnameOf(url: string): string {
     try {
@@ -98,12 +116,57 @@ function hostnameOf(url: string): string {
     }
 }
 
+<<<<<<< HEAD
+=======
+/** Fetch the profile HTML with browser-like headers, retrying with backoff. */
+async function fetchHtml(url: string): Promise<string> {
+    const headers = {
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+            '(KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+    };
+
+    const maxAttempts = 4;
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const proxyUrl = proxyConfiguration ? await proxyConfiguration.newUrl() : undefined;
+            const res = await axios.get<string>(url, {
+                headers,
+                timeout: 30_000,
+                responseType: 'text',
+                // Route through Apify proxy when configured.
+                ...(proxyUrl ? { proxy: false as const, ...buildProxyAgent(proxyUrl) } : {}),
+                // We want to inspect non-2xx ourselves rather than throw.
+                validateStatus: () => true,
+            });
+            if (res.status >= 200 && res.status < 300 && typeof res.data === 'string') {
+                return res.data;
+            }
+            throw new Error(`Unexpected HTTP status ${res.status}`);
+        } catch (err) {
+            lastError = err;
+            log.warning(`Fetch attempt ${attempt}/${maxAttempts} failed: ${(err as Error).message}`);
+            if (attempt < maxAttempts) {
+                await new Promise((r) => {
+                    setTimeout(r, attempt * 2_000);
+                });
+            }
+        }
+    }
+    throw new Error(`Failed to fetch ${url} after ${maxAttempts} attempts: ${(lastError as Error)?.message}`);
+}
+
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 /** Build an https-proxy-agent config object for axios from a proxy URL. */
 function buildProxyAgent(proxyUrl: string) {
     const agent = new HttpsProxyAgent(proxyUrl);
     return { httpAgent: agent, httpsAgent: agent };
 }
 
+<<<<<<< HEAD
 /** A single GET that returns status + body and never throws. Routes via proxy if set. */
 async function getPage(
     url: string,
@@ -151,6 +214,13 @@ async function fetchProfileHtml(url: string): Promise<string> {
 /** Extract and parse the __NEXT_DATA__ JSON blob from a Linktree page. */
 function parseNextData(html: string): Record<string, unknown> {
     const match = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+=======
+/** Extract and parse the __NEXT_DATA__ JSON blob from a Linktree page. */
+function parseNextData(html: string): Record<string, unknown> {
+    const match = html.match(
+        /<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/,
+    );
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     if (!match) throw new Error('Could not find __NEXT_DATA__ on the page. Linktree may have changed its markup.');
     try {
         return JSON.parse(match[1]);
@@ -159,6 +229,7 @@ function parseNextData(html: string): Record<string, unknown> {
     }
 }
 
+<<<<<<< HEAD
 /** Resolve a short/affiliate link to its final destination URL. */
 async function resolveFinalUrl(url: string): Promise<string | null> {
     const { status, finalUrl } = await getPage(url, { maxRedirects: 10, timeout: 20_000 });
@@ -357,23 +428,55 @@ async function mapPool<T, R>(items: T[], limit: number, fn: (item: T, index: num
     for (let w = 0; w < count; w += 1) workers.push(worker());
     await Promise.all(workers);
     return results;
+=======
+/** Best-effort resolution of a short link to its final destination URL. */
+async function resolveFinalUrl(url: string): Promise<string | null> {
+    try {
+        const proxyUrl = proxyConfiguration ? await proxyConfiguration.newUrl() : undefined;
+        const res = await axios.get(url, {
+            timeout: 20_000,
+            maxRedirects: 10,
+            validateStatus: () => true,
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LinktreeDarazScraper/1.0)' },
+            ...(proxyUrl ? { proxy: false, ...buildProxyAgent(proxyUrl) } : {}),
+        });
+        const finalUrl: string | undefined = res.request?.res?.responseUrl;
+        return finalUrl && finalUrl !== url ? finalUrl : null;
+    } catch (err) {
+        log.debug(`Could not expand ${url}: ${(err as Error).message}`);
+        return null;
+    }
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 }
 
 // ---- Main flow ------------------------------------------------------------
 
 log.info(`Fetching Linktree profile: ${cleanUrl}`);
+<<<<<<< HEAD
 const html = await fetchProfileHtml(cleanUrl);
 const nextData = parseNextData(html);
 
 const pageProps = ((nextData.props as Record<string, unknown>)?.pageProps ?? {}) as Record<string, unknown>;
+=======
+const html = await fetchHtml(cleanUrl);
+const nextData = parseNextData(html);
+
+const pageProps = ((nextData.props as Record<string, unknown>)?.pageProps ??
+    {}) as Record<string, unknown>;
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 
 // Linktree returns statusCode 404 in pageProps for missing/renamed/private profiles.
 const statusCode = pageProps.statusCode as number | undefined;
 if (statusCode && statusCode !== 200) {
     throw new Error(
         `Linktree returned status ${statusCode} for ${cleanUrl}. ` +
+<<<<<<< HEAD
             'The profile may not exist, may be private, or may have been renamed. ' +
             'Double-check the username (including any trailing characters like "_").',
+=======
+            `The profile may not exist, may be private, or may have been renamed. ` +
+            `Double-check the username (including any trailing characters like "_").`,
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     );
 }
 
@@ -401,13 +504,21 @@ const filterMsg = filterTerm
     : 'Returning ALL links.';
 log.info(`Found ${links.length} total links on @${username}. ${filterMsg}`);
 
+<<<<<<< HEAD
 // Build the base rows: keep only real (non-GROUP) links with a URL that match the filter.
 const scrapedAt = new Date().toISOString();
 const baseRows: OutputLink[] = [];
+=======
+// Build output rows: keep only real (non-GROUP) links that have a URL and match the filter.
+const scrapedAt = new Date().toISOString();
+const output: OutputLink[] = [];
+
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 for (const l of links) {
     if (l.type === 'GROUP') continue;
     const url = (l.url || '').trim();
     if (!url) continue;
+<<<<<<< HEAD
     const domain = hostnameOf(url);
     if (filterTerm && !domain.includes(filterTerm)) continue;
 
@@ -416,6 +527,23 @@ for (const l of links) {
         title: l.title || '',
         url,
         expandedUrl: null,
+=======
+
+    const domain = hostnameOf(url);
+    // Match against the hostname so e.g. tiktok.com/@daraz_x is NOT a false positive.
+    if (filterTerm && !domain.includes(filterTerm)) continue;
+
+    let expandedUrl: string | null = null;
+    if (expandShortLinks) {
+        expandedUrl = await resolveFinalUrl(url);
+    }
+
+    output.push({
+        profileUsername: username,
+        title: l.title || '',
+        url,
+        expandedUrl,
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
         domain,
         type: l.type,
         group: l.parent?.id ? groupTitleById.get(l.parent.id) ?? '' : '',
@@ -423,6 +551,7 @@ for (const l of links) {
         scrapedAt,
     });
 }
+<<<<<<< HEAD
 baseRows.sort((a, b) => a.position - b.position);
 log.info(`Matched ${baseRows.length} link(s).`);
 
@@ -473,18 +602,36 @@ if (needsExpansion && baseRows.length > 0) {
 log.info(`Pushing ${baseRows.length} row(s) to the dataset.`);
 await Actor.pushData(baseRows);
 
+=======
+
+// Stable order: by position as shown on the page.
+output.sort((a, b) => a.position - b.position);
+
+log.info(`Matched ${output.length} link(s). Pushing to dataset.`);
+await Actor.pushData(output);
+
+// Save a small run summary to the default key-value store for convenience.
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 await Actor.setValue('SUMMARY', {
     profileUrl: cleanUrl,
     username,
     totalLinksOnProfile: links.filter((l) => l.type !== 'GROUP' && l.url).length,
     filter: filterTerm || '(none)',
+<<<<<<< HEAD
     matchedLinks: baseRows.length,
     productDetailsScraped: scrapeProductDetails,
+=======
+    matchedLinks: output.length,
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
     scrapedAt,
 });
 
 log.info(
+<<<<<<< HEAD
     `Done. ${baseRows.length} link(s) saved. Open the dataset and use "Export" to download as JSON, CSV, Excel, etc.`,
+=======
+    `Done. ${output.length} link(s) saved. Open the dataset and use "Export" to download as JSON, CSV, Excel, etc.`,
+>>>>>>> ea8e858809e441f3685f49724a7f4a21452e0175
 );
 
 await Actor.exit();
